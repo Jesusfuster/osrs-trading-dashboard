@@ -1,0 +1,82 @@
+risk_profile: moderate
+capital: 10000000
+ge_slots: 8
+ge_tax_rate: 0.02
+risk_profiles:
+  conservative:
+    level1:
+      min_total_volume: 50000
+      min_records: 100
+      max_days_since_activity: 7
+    level2:
+      min_spread_pct: 2
+      max_spread_pct: 10
+      min_volume_percentile: 75
+      min_trading_frequency: 0.7
+      min_price: 100
+      max_price: 100000
+    level3:
+      min_win_rate: 70
+      min_avg_roi: 2
+      min_sharpe_ratio: 1.0
+  moderate:
+    level1:
+      min_total_volume: 20000
+      min_records: 50
+      max_days_since_activity: 14
+    level2:
+      min_spread_pct: 3
+      max_spread_pct: 15
+      min_volume_percentile: 50
+      min_trading_frequency: 0.5
+      min_price: 50
+      max_price: 500000
+    level3:
+      min_win_rate: 60
+      min_avg_roi: 3
+      min_sharpe_ratio: 0.8
+  aggressive:
+    level1:
+      min_total_volume: 5000
+      min_records: 30
+      max_days_since_activity: 30
+    level2:
+      min_spread_pct: 5
+      max_spread_pct: 30
+      min_volume_percentile: 25
+      min_trading_frequency: 0.3
+      min_price: 10
+      max_price: 5000000
+    level3:
+      min_win_rate: 50
+      min_avg_roi: 5
+      min_sharpe_ratio: 0.5
+api:
+  base_url: https://prices.runescape.wiki/api/v1/osrs
+  user_agent: 'OSRS Trading Project - Research & Analysis - Contact: your_email@example.com'
+  rate_limit_delay: 1.0
+  max_retries: 3
+  timeout: 30
+data_collection:
+  bulk_download:
+    timestep: 6h
+    chunk_size: 100
+    save_frequency: 50
+  incremental_update:
+    timestep: 1h
+    lookback_days: 30
+storage:
+  data_dir: data
+  raw_dir: data/raw
+  processed_dir: data/processed
+  logs_dir: data/logs
+  format: parquet
+  compression: snappy
+analysis:
+  min_volume_threshold: 1000
+  min_data_points: 200
+  spread_threshold: 0.02
+logging:
+  level: INFO
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file: data/logs/osrs_trading.log
