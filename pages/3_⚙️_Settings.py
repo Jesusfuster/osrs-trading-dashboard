@@ -5,6 +5,7 @@ Configure trading preferences and risk profile.
 """
 import streamlit as st
 import yaml
+import json
 from pathlib import Path
 import sys
 
@@ -87,23 +88,84 @@ with tab1:
     col4.metric("Tax Rate", f"{ge_tax:.1%}")
     
     # Save button
-    if st.button("💾 Save Settings", type="primary"):
-        try:
-            # Update config
-            config['capital'] = int(capital)
-            config['ge_slots'] = int(ge_slots)
-            config['risk_profile'] = risk_profile
-            config['ge_tax_rate'] = float(ge_tax)
-            
-            # Save to file
-            with open(config_file, 'w') as f:
-                yaml.dump(config, f, default_flow_style=False, sort_keys=False)
-            
-            st.success("✅ Settings saved successfully!")
-            st.info("💡 Run the pipeline to apply new settings: `python scripts/run_pipeline.py --mode full`")
-            
-        except Exception as e:
-            st.error(f"❌ Error saving settings: {e}")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("💾 Save Settings (Local Only)", type="secondary"):
+            try:
+                # Update config
+                config['capital'] = int(capital)
+                config['ge_slots'] = int(ge_slots)
+                config['risk_profile'] = risk_profile
+                config['ge_tax_rate'] = float(ge_tax)
+                
+                # Save to file
+                with open(config_file, 'w') as f:
+                    yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+                
+                st.success("✅ Settings saved locally!")
+                st.info("💡 Changes will apply on next manual pipeline run")
+                
+            except Exception as e:
+                st.error(f"❌ Error saving settings: {e}")
+    
+    with col2:
+        reanalyze = st.checkbox("Force complete re-analysis", value=False)
+        
+        if st.button("🚀 Save & Request Backend Update", type="primary"):
+            try:
+                # Update config
+                config['capital'] = int(capital)
+                config['ge_slots'] = int(ge_slots)
+                config['risk_profile'] = risk_profile
+                config['ge_tax_rate'] = float(ge_tax)
+                
+                # Save config
+                with open(config_file, 'w') as f:
+                    yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+                
+                # Create user request
+                import uuid
+                from datetime import datetime
+                
+                user_requests_file = project_root / '.streamlit' / 'user_requests.json'
+                
+                # Load existing requests
+                if user_requests_file.exists():
+                    with open(user_requests_file, 'r') as f:
+                        requests = json.load(f)
+                else:
+                    requests = []
+                
+                # Add new request
+                new_request = {
+                    'id': str(uuid.uuid4())[:8],
+                    'timestamp': datetime.now().isoformat(),
+                    'capital': capital,
+                    'risk_profile': risk_profile,
+                    'reanalyze': reanalyze,
+                    'status': 'pending'
+                }
+                
+                requests.append(new_request)
+                
+                # Save
+                with open(user_requests_file, 'w') as f:
+                    json.dump(requests, f, indent=2)
+                
+                st.success("✅ Settings saved and backend notified!")
+                st.info("""
+                📝 **What happens next:**
+                1. Settings saved to config.yaml
+                2. Request queued for backend
+                3. Backend will pull changes and re-run pipeline
+                4. New candidates will appear here (~13-90 min)
+                
+                **Note:** Backend must be running for this to work
+                """)
+                
+            except Exception as e:
+                st.error(f"❌ Error: {e}")
 
 with tab2:
     st.subheader("Risk Profile Filters")

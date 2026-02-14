@@ -1,37 +1,70 @@
-# Data
-data/
-*.parquet
-*.csv
-*.db
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
-venv/
 *.egg-info/
 dist/
 build/
+*.egg
 
-# Jupyter
-.ipynb_checkpoints
-*.ipynb_checkpoints
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
 
-# IDE
+# ================================
+# DATA FILES - IMPORTANTE
+# ================================
+
+# RAW data - NO subir (muy pesado, solo backend)
+data/raw/timeseries_6h/*.parquet
+data/raw/timeseries_1h/*.parquet
+data/raw/mapping.parquet
+data/raw/timeseries_6h/_update_metadata.json
+
+# PROCESSED data - SÍ subir (necesario para Streamlit)
+# Comentado = se sube a GitHub
+# data/processed/*.parquet
+# data/processed/metadata.json
+
+# Logs - NO subir
+data/logs/*.log
+data/logs/auto_sync.log
+
+# Keep directory structure
+!data/raw/timeseries_6h/.gitkeep
+!data/raw/timeseries_1h/.gitkeep
+!data/processed/.gitkeep
+!data/logs/.gitkeep
+
+# ================================
+# STREAMLIT
+# ================================
+.streamlit/secrets.toml
+# user_requests.json se DEBE subir para comunicación
+
+# ================================
+# IDE & OS
+# ================================
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Logs
-*.log
-logs/
-
-# OS
 .DS_Store
 Thumbs.db
 
-.venv/ 
+# ================================
+# JUPYTER
+# ================================
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# ================================
+# TEMPORARY
+# ================================
+*.tmp
+*.bak
+~*
